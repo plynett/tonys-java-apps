@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CACR Wave Calculator</title>
+    <style>
+        body {
+            margin: 10px;
+            padding: 10px;
+            width: 90%;
+            height: 450px;
+        }
+        #main-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        #panel1, #results {
+            width: 50%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+        }
+        td {
+            padding: 5px;
+            vertical-align: middle;
+        }
+        input[type="text"], select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+        input[readonly] {
+            background-color: #f0f0f0;
+        }
+        label {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <img src="cacr.mini.gif" ALIGN="LEFT">
+    <P><FONT COLOR="#0000FF"><FONT SIZE=+4><center>
+        University of Delaware 
+        Wave Calculator</center></FONT>
+    <clear "LEFT">
+    <CENTER><P>
+    <HR WIDTH="100%"></P></CENTER>
+    
+    <!-- Main Container -->
+    <div id="main-container">
+        <!-- Left Panel (Input Panel) -->
+        <div id="panel1">
+            <table>
+                <tr>
+                    <td colspan="2"><strong>Deep Water Values:</strong></td>
+                </tr>
+                <tr>
+                    <td><label for="Hin">Wave Height (H, m):</label></td>
+                    <td><input type="text" id="Hin" value="1"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="torf">Select:</label>
+                        <select id="torf">
+                            <option value="Period">Period (T, s)</option>
+                            <option value="Frequency">Frequency (f, Hz)</option>
+                        </select>
+                    </td>
+                    <td><input type="text" id="Tin" value="12"></td>
+                </tr>
+                <tr>
+                    <td><label for="angle0">Wave Angle (°):</label></td>
+                    <td><input type="text" id="angle0" value="0"></td>
+                </tr>
+                <tr>
+                    <td><label for="din">Local Depth (d, m):</label></td>
+                    <td><input type="text" id="din" value="10"></td>
+                </tr>
+                <!-- Empty rows for spacing -->
+                <tr><td colspan="2">&nbsp;</td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+            </table>
+        </div>
+        <!-- Right Panel (Results Panel) -->
+        <div id="results">
+            <table>
+                <tr>
+                    <td><label>L (m) =</label></td>
+                    <td><input type="text" id="lout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>k (1/m) = 2π/L =</label></td>
+                    <td><input type="text" id="kout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>C (m/s) = L/T =</label></td>
+                    <td><input type="text" id="Cout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>C<sub>g</sub> (m/s)=</label></td>
+                    <td><input type="text" id="Cgout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>n = C<sub>g</sub>/C =</label></td>
+                    <td><input type="text" id="nout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>K<sub>s</sub> =</label></td>
+                    <td><input type="text" id="Ksout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>K<sub>r</sub> =</label></td>
+                    <td><input type="text" id="Krout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>Angle (°) =</label></td>
+                    <td><input type="text" id="angleout" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>H (m) =</label></td>
+                    <td><input type="text" id="Hshal" readonly></td>
+                </tr>
+                <tr>
+                    <td><label>u<sub>b</sub> (m/s) =</label></td>
+                    <td><input type="text" id="ubout" readonly></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script>
+        // Constants
+        const g = 9.81; // Acceleration due to gravity
+
+        // Hyperbolic functions
+        function hyperbolicSinh(x) {
+            return (Math.exp(x) - Math.exp(-x)) / 2;
+        }
+
+        function hyperbolicCosh(x) {
+            return (Math.exp(x) + Math.exp(-x)) / 2;
+        }
+
+        function hyperbolicTanh(x) {
+            return hyperbolicSinh(x) / hyperbolicCosh(x);
+        }
+
+        // Function to calculate wave number (k) using iterative method
+        function waveNumber(d, T) {
+            const omega = 2 * Math.PI / T;
+            let k = omega * omega / g; // Initial guess for k
+            for (let i = 0; i < 1000; i++) {
+                let kPrev = k;
+                k = omega * omega / (g * Math.tanh(k * d));
+                if (Math.abs(k - kPrev) < 1e-10) {
+                    break;
+                }
+            }
+            return k;
+        }
+
+        // Function to calculate refracted angle (theta)
+        function calculateTheta(theta0, C, C0) {
+            let sinTheta = (C / C0) * Math.sin(theta0 * Math.PI / 180);
+            let sinThetaClamped = Math.min(Math.max(sinTheta, -1), 1); // Clamp between -1 and 1
+            let theta = Math.asin(sinThetaClamped) * 180 / Math.PI;
+            return theta;
+        }
+
+        // Function to calculate group velocity (Cg)
+        function groupVelocity(C, k, d) {
+            let n = 0.5 * (1 + (2 * k * d) / Math.sinh(2 * k * d));
+            return n * C;
+        }
+
+        // Function to calculate shoaling coefficient (Ks)
+        function shoalingCoef(Cg0, Cg) {
+            return Math.sqrt(Cg0 / Cg);
+        }
+
+        // Function to calculate refraction coefficient (Kr)
+        function refractionCoef(theta0, theta) {
+            let cosTheta0 = Math.cos(theta0 * Math.PI / 180);
+            let cosTheta = Math.cos(theta * Math.PI / 180);
+            return Math.sqrt(cosTheta0 / cosTheta);
+        }
+
+        // Function to perform calculations and update outputs
+        function performCalculations() {
+            try {
+                // Read inputs
+                let Hin = parseFloat(document.getElementById('Hin').value);
+                let Tin = document.getElementById('Tin').value;
+                let din = parseFloat(document.getElementById('din').value);
+                let angle0 = parseFloat(document.getElementById('angle0').value);
+                let torf = document.getElementById('torf').value;
+
+                // Validate inputs
+                if (isNaN(Hin) || isNaN(din) || isNaN(angle0)) {
+                    // If inputs are invalid, clear outputs and return
+                    clearOutputs();
+                    return;
+                }
+
+                let T;
+                if (torf === 'Period') {
+                    T = parseFloat(Tin);
+                } else {
+                    let frequency = parseFloat(Tin);
+                    if (frequency <= 0) {
+                        clearOutputs();
+                        return;
+                    }
+                    T = 1 / frequency;
+                }
+
+                if (isNaN(T) || T <= 0) {
+                    clearOutputs();
+                    return;
+                }
+
+                // Perform calculations
+                let k = waveNumber(din, T);
+                let L = 2 * Math.PI / k;
+                let C = L / T;
+
+                // Deep water calculations
+                let k0 = (2 * Math.PI) / (g * T * T / (2 * Math.PI));
+                let L0 = 2 * Math.PI / k0;
+                let C0 = L0 / T;
+
+                let thetaDeg = calculateTheta(angle0, C, C0);
+                let Cg = groupVelocity(C, k, din);
+                let n = Cg / C;
+                let Cg0 = C0 / 2; // Deep water group velocity
+
+                let Ks = shoalingCoef(Cg0, Cg);
+                let Kr = refractionCoef(angle0, thetaDeg);
+                let Hshal = Ks * Kr * Hin;
+                let Hb = 0.78 * din;
+
+                let HshalText;
+                if (Hshal > Hb) {
+                    Hshal = Hb;
+                    HshalText = Hshal.toFixed(4) + ' (breaking)';
+                } else {
+                    HshalText = Hshal.toFixed(4);
+                }
+
+                let ub = (2 * Math.PI / T) * (Hshal / 2) / hyperbolicSinh(k * din);
+
+                // Update outputs
+                document.getElementById('lout').value = L.toFixed(4);
+                document.getElementById('kout').value = k.toFixed(4);
+                document.getElementById('Cout').value = C.toFixed(4);
+                document.getElementById('Cgout').value = Cg.toFixed(4);
+                document.getElementById('nout').value = n.toFixed(4);
+                document.getElementById('Ksout').value = Ks.toFixed(4);
+                document.getElementById('Krout').value = Kr.toFixed(4);
+                document.getElementById('angleout').value = thetaDeg.toFixed(4);
+                document.getElementById('Hshal').value = HshalText;
+                document.getElementById('ubout').value = ub.toFixed(4);
+
+            } catch (error) {
+                console.error(error);
+                clearOutputs();
+            }
+        }
+
+        // Function to clear output fields
+        function clearOutputs() {
+            document.getElementById('lout').value = '';
+            document.getElementById('kout').value = '';
+            document.getElementById('Cout').value = '';
+            document.getElementById('Cgout').value = '';
+            document.getElementById('nout').value = '';
+            document.getElementById('Ksout').value = '';
+            document.getElementById('Krout').value = '';
+            document.getElementById('angleout').value = '';
+            document.getElementById('Hshal').value = '';
+            document.getElementById('ubout').value = '';
+        }
+
+        // Event listeners for inputs
+        document.getElementById('Hin').addEventListener('input', performCalculations);
+        document.getElementById('Tin').addEventListener('input', performCalculations);
+        document.getElementById('din').addEventListener('input', performCalculations);
+        document.getElementById('angle0').addEventListener('input', performCalculations);
+        document.getElementById('torf').addEventListener('change', performCalculations);
+
+        // Perform initial calculations on page load
+        window.addEventListener('load', performCalculations);
+    </script>
+
+    <p><font color=#000000">
+    The Wave Calculator works in metric, taking deepwater wave height, period (seconds) or frequency (Hz), and wave direction (in degrees),  and determining the wave length (L, in m), the wave number (k, in 1/m),  wave celerity (C = L/T, in m/s),  direction (degrees),  shoaling and refraction coefficients (Ks, Kr) and the group velocity Cg  at  the shallow water depth you specify.  The magnitude of the bottom velocity u_b is also calculated.
+    <p> The calculations are based on the dispersion relationship for progressive linear water waves and Snell's Law for straight and parallel offshore contours.  (Ref: Dean and Dalrymple, <a href="https://doi.org/10.1142/1232">Water Wave Mechanics for Engineering and Scientists,</a> World Scientific Press.)
+
+
+</body>
+</html>

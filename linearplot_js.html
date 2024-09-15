@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Superposition of Multiple Linear Waves with Calculated Values</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #input-panel {
+            width: 350px;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+        }
+        #input-panel h2 {
+            margin-top: 0;
+        }
+        #wave-inputs-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #input-table, #calculated-table {
+            width: 45%;
+            margin-right: 5%;
+            border-collapse: collapse;
+        }
+        #input-table th, #input-table td,
+        #calculated-table th, #calculated-table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        #input-table th, #calculated-table th {
+            background-color: #f2f2f2;
+        }
+        #input-panel input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        #input-panel button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        #plot-area {
+            flex-grow: 1;
+            position: relative;
+        }
+        #plot-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: #ffffff;
+        }
+        #elapsed-time {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Input Panel -->
+    <div id="input-panel">
+        <h2>Wave Parameters</h2>
+        <label for="depth">Depth (d)</label>
+        <input type="number" id="depth" value="1" step="0.1">
+
+        <h3>Wave Inputs</h3>
+        <div id="wave-inputs-container">
+            <!-- Input Table -->
+            <table id="input-table">
+                <thead>
+                    <tr>
+                        <th>Wave #</th>
+                        <th>Amplitude (H)</th>
+                        <th>Period (T)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><input type="number" class="amplitude" value="1" step="0.1"></td>
+                        <td><input type="number" class="period" value="2" step="0.1"></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                        <td><input type="number" class="period" value="2" step="0.1"></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                        <td><input type="number" class="period" value="2" step="0.1"></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                        <td><input type="number" class="period" value="2" step="0.1"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Calculated Values Table -->
+            <table id="calculated-table">
+                <thead>
+                    <tr>
+                        <th>Wavelength (L)</th>
+                        <th>Speed (C)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="wave1-lambda">-</td>
+                        <td id="wave1-speed">-</td>
+                    </tr>
+                    <tr>
+                        <td id="wave2-lambda">-</td>
+                        <td id="wave2-speed">-</td>
+                    </tr>
+                    <tr>
+                        <td id="wave3-lambda">-</td>
+                        <td id="wave3-speed">-</td>
+                    </tr>
+                    <tr>
+                        <td id="wave4-lambda">-</td>
+                        <td id="wave4-speed">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button id="start-button">Start Animation</button>
+        <button id="stop-button">Stop Animation</button>
+        <button id="reset-button">Reset</button>
+    </div>
+
+    <!-- Plot Area -->
+    <div id="plot-area">
+        <canvas id="plot-canvas"></canvas>
+        <!-- Elapsed Time Display -->
+        <div id="elapsed-time">Elapsed Time: 0.0 s</div>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script>
+        // Get references to DOM elements
+        const depthInput = document.getElementById('depth');
+        const amplitudeInputs = document.querySelectorAll('.amplitude');
+        const periodInputs = document.querySelectorAll('.period');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const resetButton = document.getElementById('reset-button');
+        const canvas = document.getElementById('plot-canvas');
+        const context = canvas.getContext('2d');
+        const elapsedTimeDisplay = document.getElementById('elapsed-time');
+
+        // References to calculated values cells
+        const lambdaCells = [
+            document.getElementById('wave1-lambda'),
+            document.getElementById('wave2-lambda'),
+            document.getElementById('wave3-lambda'),
+            document.getElementById('wave4-lambda')
+        ];
+        const speedCells = [
+            document.getElementById('wave1-speed'),
+            document.getElementById('wave2-speed'),
+            document.getElementById('wave3-speed'),
+            document.getElementById('wave4-speed')
+        ];
+
+        let animationFrameId;
+        let startTime;
+
+        // Set canvas dimensions
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Function to calculate wave number (k) using iterative method
+        function waveNumber(d, T) {
+            const g = 9.81; // Acceleration due to gravity
+            const omega = 2 * Math.PI / T;
+            let k = omega * omega / (g * Math.sqrt(Math.tanh(omega * omega * d / g))); // Initial guess for k, Eckhart
+      
+            for (let i = 0; i < 100000; i++) {
+                let kPrev = k;
+                k = omega * omega / (g * Math.tanh(k * d));
+                if (Math.abs(k - kPrev) < 1e-6) {
+                    break;
+                }
+            }
+            return k;
+        }
+
+        // Function to draw axes with tick marks and labels
+        function drawAxes(context, xScale, yScale, xMax, yMax) {
+            // (Same as before; no changes needed)
+            context.save();
+            context.strokeStyle = '#000000';
+            context.fillStyle = '#000000';
+            context.lineWidth = 1;
+            context.font = '12px Arial';
+
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Draw X-axis
+            context.beginPath();
+            context.moveTo(0, height / 2);
+            context.lineTo(width, height / 2);
+            context.stroke();
+
+            // Draw Y-axis
+            context.beginPath();
+            context.moveTo(50, 0);
+            context.lineTo(50, height);
+            context.stroke();
+
+            // X-axis tick marks and labels
+            const xTickSpacing = (width - 60) / 10;
+            for (let i = 0; i <= 10; i++) {
+                const x = 50 + i * xTickSpacing;
+                context.beginPath();
+                context.moveTo(x, height / 2 - 5);
+                context.lineTo(x, height / 2 + 5);
+                context.stroke();
+
+                const xLabel = (xMax / 10 * i).toFixed(1);
+                context.fillText(xLabel, x - 10, height / 2 + 20);
+            }
+            context.fillText('Distance (m)', width / 2, height / 2 + 40);
+
+            // Y-axis tick marks and labels
+            const yTickSpacing = (height - 40) / 4;
+            for (let i = -2; i <= 2; i++) {
+                const y = height / 2 - i * yTickSpacing;
+                context.beginPath();
+                context.moveTo(45, y);
+                context.lineTo(55, y);
+                context.stroke();
+
+                const yLabel = (yMax / 2 * i).toFixed(1);
+                if (i !== 0) {
+                    context.fillText(yLabel, 10, y + 5);
+                }
+            }
+            context.fillText('Elevation (m)', 10, 20);
+
+            context.restore();
+        }
+
+        // Function to update calculated values table
+        function updateCalculatedValues() {
+            const d = parseFloat(depthInput.value);
+            const depthValid = !isNaN(d) && d > 0 ? d : 1;
+
+            for (let i = 0; i < amplitudeInputs.length; i++) {
+                const H = parseFloat(amplitudeInputs[i].value);
+                const T = parseFloat(periodInputs[i].value);
+
+                const amplitudeValid = !isNaN(H) ? H : 0;
+                const periodValid = !isNaN(T) && T !== 0 ? T : 2;
+
+                if (amplitudeValid === 0) {
+                    // If amplitude is zero, display dashes
+                    lambdaCells[i].textContent = '-';
+                    speedCells[i].textContent = '-';
+                    continue;
+                }
+
+                const omega = 2 * Math.PI / periodValid;
+                const k = waveNumber(depthValid, periodValid);
+                const L = 2 * Math.PI / k; // Wavelength
+                const C = L / periodValid; // Speed
+
+                // Update calculated values in the table
+                lambdaCells[i].textContent = L.toFixed(2);
+                speedCells[i].textContent = C.toFixed(2);
+            }
+        }
+
+        // Function to plot the waveform with animation
+        function animateWaveform(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsedTime = (timestamp - startTime) / 1000; // Convert to seconds
+
+            // Update elapsed time display
+            elapsedTimeDisplay.textContent = `Elapsed Time: ${elapsedTime.toFixed(1)} s`;
+
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Get depth value
+            const d = parseFloat(depthInput.value);
+
+            const depthValid = !isNaN(d) && d > 0 ? d : 1; // Default to 1 if invalid or zero
+
+            // Get wave parameters for all waves
+            const waves = [];
+            let T1 = null; // Period of wave #1
+            let k1 = null; // Wave number of wave #1
+            for (let i = 0; i < amplitudeInputs.length; i++) {
+                const H = parseFloat(amplitudeInputs[i].value);
+                const T = parseFloat(periodInputs[i].value);
+
+                const amplitudeValid = !isNaN(H) ? H : 0;
+                const periodValid = !isNaN(T) && T !== 0 ? T : 2;
+
+                if (amplitudeValid === 0) continue;
+
+                const omega = 2 * Math.PI / periodValid;
+                const k = waveNumber(depthValid, periodValid);
+
+                // Store T1 and k1 for wave #1
+                if (T1 === null) {
+                    T1 = periodValid;
+                    k1 = k;
+                }
+
+                waves.push({ H: amplitudeValid, omega, k, T: periodValid });
+            }
+
+            // If no waves are active, draw a flat line and continue animation
+            if (waves.length === 0) {
+                // Draw axes
+                drawAxes(context, 1, 1, 10, 1);
+
+                context.lineWidth = 2;
+                context.strokeStyle = '#0000ff';
+                context.beginPath();
+                context.moveTo(50, canvas.height / 2);
+                context.lineTo(canvas.width, canvas.height / 2);
+                context.stroke();
+
+                // Continue the animation loop
+                animationFrameId = requestAnimationFrame(animateWaveform);
+                return;
+            }
+
+            // Calculate total amplitude sum
+            let amplitudeSum = 0;
+            for (const wave of waves) {
+                amplitudeSum += 0.6*Math.abs(wave.H);
+            }
+            amplitudeSum = amplitudeSum > 0 ? amplitudeSum : 1; // Prevent division by zero
+
+            // Get the wavelength of wave #1 for x-axis scaling
+            const L1 = 2 * Math.PI / k1; // Wavelength of wave #1
+            
+            let maxL=L1;
+            for (const wave of waves) {
+                maxL=Math.max(maxL,Math.PI/wave.k);
+            }
+            const xMax = 30 * maxL; // Cover 10 wavelengths of wave #1
+
+            // Scale factors
+            const xScale = (canvas.width - 60) / xMax; // Leave margin for Y-axis labels
+            const yScale = (canvas.height - 40) / (2 * amplitudeSum); // Adjusted scaling as per your request
+
+            // Draw axes
+            drawAxes(context, xScale, yScale, xMax, amplitudeSum);
+
+            // Adjust animation speed so that wave #1 travels 10 wavelengths in 10 seconds
+            const t_wall = 10; // Wall clock time in seconds for wave #1 to travel xMax
+
+            // Canvas settings
+            context.lineWidth = 2;
+            context.strokeStyle = '#0000ff';
+            context.beginPath();
+
+            // Plotting the wave
+            const numPoints = 10000;
+            for (let i = 0; i <= numPoints; i++) {
+                const xWorld = (i / numPoints) * xMax;
+                const x = 50 + xWorld * xScale; // Adjust for Y-axis margin
+
+                // Sum the contributions from all waves
+                let yTotal = 0;
+                for (const wave of waves) {
+                    // Adjusted time variable for animation speed
+                    const t_effective = elapsedTime * (T1 / t_wall);
+
+                    // Linear wave equation: η(x, t) = H/2 * cos(kx - ωt_effective)
+                    const y = (wave.H / 2) * Math.cos(wave.k * xWorld - wave.omega * t_effective);
+                    yTotal += y;
+                }
+
+                // Convert world coordinates to canvas coordinates
+                const y = canvas.height / 2 - yTotal * yScale;
+
+                if (i === 0) {
+                    context.moveTo(x, y);
+                } else {
+                    context.lineTo(x, y);
+                }
+            }
+            context.stroke();
+
+            // Request the next frame
+            animationFrameId = requestAnimationFrame(animateWaveform);
+        }
+
+        // Start animation
+        function startAnimation() {
+            cancelAnimationFrame(animationFrameId); // Cancel any existing animation
+            startTime = null; // Reset start time
+            animationFrameId = requestAnimationFrame(animateWaveform);
+        }
+
+        // Stop animation
+        function stopAnimation() {
+            cancelAnimationFrame(animationFrameId);
+        }
+
+        // Reset function
+        function resetInputs() {
+            depthInput.value = '1';
+            amplitudeInputs.forEach((input, index) => {
+                input.value = index === 0 ? '1' : '0';
+            });
+            periodInputs.forEach((input) => {
+                input.value = '2';
+            });
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            elapsedTimeDisplay.textContent = 'Elapsed Time: 0.0 s';
+            stopAnimation();
+            updateCalculatedValues(); // Update calculated values on reset
+        }
+
+        // Event listeners
+        startButton.addEventListener('click', startAnimation);
+        stopButton.addEventListener('click', stopAnimation);
+        resetButton.addEventListener('click', resetInputs);
+
+        // Update calculated values whenever inputs change
+        depthInput.addEventListener('input', updateCalculatedValues);
+        amplitudeInputs.forEach((input) => {
+            input.addEventListener('input', updateCalculatedValues);
+        });
+        periodInputs.forEach((input) => {
+            input.addEventListener('input', updateCalculatedValues);
+        });
+
+        // Initial calculation
+        updateCalculatedValues();
+    </script>
+</body>
+</html>

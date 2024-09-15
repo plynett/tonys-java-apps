@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Superposition of Multiple Linear Waves with Chart.js</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            /* Removed overflow: hidden; to allow scrolling */
+        }
+        #main-container {
+            display: flex;
+            /* Removed fixed height to allow content to determine height */
+            align-items: flex-start; /* Align items to the top */
+        }
+        #input-panel {
+            width: 420px;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #ccc;
+            /* Removed overflow-y: auto; to prevent scroll bars */
+            flex-shrink: 0; /* Prevent the input panel from shrinking */
+            font-size: 12px;
+        }
+        #input-panel h2 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        #wave-inputs-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #input-table, #calculated-table {
+            width: 45%;
+            margin-right: 5%;
+            border-collapse: collapse;
+        }
+        #input-table th, #input-table td,
+        #calculated-table th, #calculated-table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        #input-table th, #calculated-table th {
+            background-color: #f2f2f2;
+        }
+        #input-panel input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+            font-size: 10px;
+        }
+        #input-panel button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        #plot-area {
+            flex-grow: 1;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            /* Ensure the plot area doesn't shrink */
+            flex-shrink: 0;
+        }
+        #plot-canvas {
+            width: 100%;
+            height: 400px; /* Set a fixed height for the canvas */
+            display: block;
+            background-color: #ffffff;
+        }
+        #elapsed-time {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        /* Additional styles for the explanatory text */
+        #explanation {
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        #explanation ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        #header {
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Explanatory Text -->
+    <div id="header">
+        <img src="cacr.mini.gif" ALIGN="LEFT">
+        <FONT COLOR="#0000FF"><center> <font size=+3>Superposition of Water Waves</FONT></P> </center>
+            
+        <CENTER><P>
+        <HR WIDTH="100%"></P></CENTER>    
+    </div>
+
+    <!-- Main Container -->
+    <div id="main-container">
+        <!-- Input Panel -->
+        <div id="input-panel">
+            <h2>Wave Parameters</h2>
+            <label for="depth">Depth (d)</label>
+            <input type="number" id="depth" value="10" step="0.1">
+            <br> <br>
+            <div id="wave-inputs-container">
+                <!-- Input Table -->
+                <table id="input-table">
+                    <thead>
+                        <tr>
+                            <th>Wave #</th>
+                            <th>Amplitude (H, m)</th>
+                            <th>WavePeriod (T, s)</th>
+                            <th>Direction (+1/-1)</th>
+                            <th>Wavelength (L, m)</th>
+                            <th>Speed (C, m/s)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><input type="number" class="amplitude" value="1" step="0.1"></td>
+                            <td><input type="number" class="period" value="12" step="0.1"></td>
+                            <td><input type="number" class="dir" value="1" step="2"></td>
+                            <td id="wave1-lambda">-</td>
+                            <td id="wave1-speed">-</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                            <td><input type="number" class="period" value="12" step="0.1"></td>
+                            <td><input type="number" class="dir" value="1" step="2"></td>
+                            <td id="wave2-lambda">-</td>
+                            <td id="wave2-speed">-</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                            <td><input type="number" class="period" value="12" step="0.1"></td>
+                            <td><input type="number" class="dir" value="1" step="2"></td>
+                            <td id="wave3-lambda">-</td>
+                            <td id="wave3-speed">-</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><input type="number" class="amplitude" value="0" step="0.1"></td>
+                            <td><input type="number" class="period" value="12" step="0.1"></td>
+                            <td><input type="number" class="dir" value="1" step="2"></td>
+                            <td id="wave4-lambda">-</td>
+                            <td id="wave4-speed">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button id="start-button">Start Animation</button>
+            <button id="stop-button">Stop Animation</button>
+            <button id="reset-button">Reset</button>
+        </div>
+
+        <!-- Plot Area -->
+        <div id="plot-area">
+            <canvas id="plot-canvas"></canvas>
+            <!-- Elapsed Time Display -->
+            <div id="elapsed-time">Elapsed Time: 0.0 s</div>
+        </div>
+    </div>
+
+    <!-- Explanatory Text -->
+    <div id="explanation">
+          
+        <FONT COLOR="#000000">
+        <p>
+            The sea surface motion is the superposition of numerous wave trains. Here one to four (linear) waves can be summed, traveling in the +x direction or the opposite direction. You can examine one, two, three, or four waves together by setting the appropriate wave heights to zero. The displayed quantities: <strong>Wavelength (L)</strong> and <strong>Speed (C)</strong> denote the characteristics of each wave. Pressing <strong>Reset</strong> will restore the default values. (Note: The plot region is not to scale with the depth.)
+        </p>
+        <p>
+            A variety of phenomena can be examined with this applet:
+        </p>
+        <ul>
+            <li>
+                <strong>Single wave trains:</strong> Found by zeroing the heights of the other three waves. The speed of the wave, <em>C</em>, can be determined by noting the time it takes a wave to traverse the entire screen.
+            </li>
+            <li>
+                <strong>Wave groups:</strong> Very noticeable when two (or more) waves have nearly the same wave period. The group velocity can be determined empirically by timing the group over the distance.
+            </li>
+            <li>
+                <strong>Standing wave systems:</strong> Occur when two waves have the same characteristics but are traveling in opposite directions.
+            </li>
+            <li>
+                <strong>Wave groups reflecting from a wall:</strong> Use two waves to make a wave group (each wave with a slightly different period); then add two more waves with the opposite direction but otherwise the same characteristics.
+            </li>
+        </ul>
+
+        <p>
+            The time step and domain length are taken from the properties of the first wave.
+        </p>
+        <p>
+            <span style="color: #FF0000;">Comments: <a href="mailto:rad@udel.edu">Robert A. Dalrymple</a></span>
+        </p>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script>
+        // Get references to DOM elements
+        const depthInput = document.getElementById('depth');
+        const amplitudeInputs = document.querySelectorAll('.amplitude');
+        const periodInputs = document.querySelectorAll('.period');
+        const dirInputs = document.querySelectorAll('.dir');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const resetButton = document.getElementById('reset-button');
+        const elapsedTimeDisplay = document.getElementById('elapsed-time');
+
+        // References to calculated values cells
+        const lambdaCells = [
+            document.getElementById('wave1-lambda'),
+            document.getElementById('wave2-lambda'),
+            document.getElementById('wave3-lambda'),
+            document.getElementById('wave4-lambda')
+        ];
+        const speedCells = [
+            document.getElementById('wave1-speed'),
+            document.getElementById('wave2-speed'),
+            document.getElementById('wave3-speed'),
+            document.getElementById('wave4-speed')
+        ];
+
+        let animationFrameId;
+        let startTime;
+
+        // Include Chart.js code for plotting
+        let waveChart;
+
+        function createChart() {
+            const ctx = document.getElementById('plot-canvas').getContext('2d');
+            waveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Wave Elevation',
+                        data: [],
+                        borderColor: '#0000ff',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    animation: {
+                        duration: 0
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Distance (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Elevation (m)'
+                            },
+                            min: -1, // Initial placeholder value
+                            max: 1    // Initial placeholder value
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function updateChart(xData, yData) {
+            if (!waveChart) return;
+            waveChart.data.labels = xData;
+            waveChart.data.datasets[0].data = yData;
+            waveChart.update('none'); // 'none' to disable animation on update
+        }
+
+        // Function to calculate wave number (k) using iterative method
+        function waveNumber(d, T) {
+            const g = 9.81; // Acceleration due to gravity
+            const omega = 2 * Math.PI / T;
+            let k = omega * omega / (g * Math.sqrt(Math.tanh(omega * omega * d / g))); // Initial guess for k, Eckhart
+      
+            for (let i = 0; i < 100000; i++) {
+                let kPrev = k;
+                k = omega * omega / (g * Math.tanh(k * d));
+                if (Math.abs(k - kPrev) < 1e-6) {
+                    break;
+                }
+            }
+            return k;
+        }
+
+        // Function to update calculated values table
+        function updateCalculatedValues() {
+            const d = parseFloat(depthInput.value);
+            const depthValid = !isNaN(d) && d > 0 ? d : 1;
+
+            for (let i = 0; i < amplitudeInputs.length; i++) {
+                const H = parseFloat(amplitudeInputs[i].value);
+                const T = parseFloat(periodInputs[i].value);
+
+                const amplitudeValid = !isNaN(H) ? H : 0;
+                const periodValid = !isNaN(T) && T !== 0 ? T : 2;
+
+                if (amplitudeValid === 0) {
+                    // If amplitude is zero, display dashes
+                    lambdaCells[i].textContent = '-';
+                    speedCells[i].textContent = '-';
+                    continue;
+                }
+
+                const omega = 2 * Math.PI / periodValid;
+                const k = waveNumber(depthValid, periodValid);
+                const L = 2 * Math.PI / k; // Wavelength
+                const C = L / periodValid; // Speed
+
+                // Update calculated values in the table
+                lambdaCells[i].textContent = L.toFixed(2);
+                speedCells[i].textContent = C.toFixed(2);
+            }
+        }
+
+        // Function to plot the waveform with animation
+        function animateWaveform(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsedTime = (timestamp - startTime) / 1000; // Convert to seconds
+
+            // Get depth value
+            const d = parseFloat(depthInput.value);
+            const depthValid = !isNaN(d) && d > 0 ? d : 1;
+
+            // Get wave parameters for all waves
+            const waves = [];
+            let T1 = null;
+            let k1 = null;
+            for (let i = 0; i < amplitudeInputs.length; i++) {
+                const H = parseFloat(amplitudeInputs[i].value);
+                const T = parseFloat(periodInputs[i].value);
+                let DirLR = parseFloat(dirInputs[i].value);
+                if (DirLR >= 0) {DirLR=1;} else {DirLR=-1;}
+
+                const amplitudeValid = !isNaN(H) ? H : 0;
+                const periodValid = !isNaN(T) && T !== 0 ? T : 2;
+
+                if (amplitudeValid === 0) continue;
+
+                const omega = DirLR * 2 * Math.PI / periodValid;
+                const k = waveNumber(depthValid, periodValid);
+
+                if (T1 === null) {
+                    T1 = periodValid;
+                    k1 = k;
+                }
+
+                waves.push({ H: amplitudeValid, omega, k, T: periodValid });
+            }
+
+            // If no waves are active, clear the chart and continue animation
+            if (waves.length === 0) {
+                updateChart([], []);
+                animationFrameId = requestAnimationFrame(animateWaveform);
+                return;
+            }
+
+            // Calculate total amplitude sum for scaling
+            let amplitudeSum = 0;
+            for (const wave of waves) {
+                amplitudeSum += 0.5 * Math.abs(wave.H);
+            }
+            amplitudeSum = amplitudeSum > 0 ? amplitudeSum : 1;
+
+            // Update y-axis limits
+            if (waveChart) {
+                waveChart.options.scales.y.min = -amplitudeSum;
+                waveChart.options.scales.y.max = amplitudeSum;
+            }
+
+            // Get the wavelength of wave #1 for x-axis scaling
+            const L1 = 2 * Math.PI / k1;
+            let maxL = L1;
+            for (const wave of waves) {
+                maxL = Math.max(maxL, 2 * Math.PI / wave.k);
+            }
+            const xMax = 30 * maxL;
+
+            // Adjusted time variable for animation speed
+            const t_wall = 1;
+            const t_effective = elapsedTime * (T1 / t_wall);
+
+            // Generate data points
+            const numPoints = 2000;
+            const xData = [];
+            const yData = [];
+            for (let i = 0; i <= numPoints; i++) {
+                const xWorld = (i / numPoints) * xMax;
+                let yTotal = 0;
+                for (const wave of waves) {
+                    const y = (wave.H / 2) * Math.cos(wave.k * xWorld - wave.omega * t_effective);
+                    yTotal += y;
+                }
+                xData.push(xWorld);
+                yData.push(yTotal);
+            }
+
+            // Update the chart
+            updateChart(xData, yData);
+
+            // Update elapsed time display
+            elapsedTimeDisplay.textContent = `Elapsed Time: ${t_effective.toFixed(1)} s`;
+
+            // Request the next frame
+            animationFrameId = requestAnimationFrame(animateWaveform);
+        }
+
+        // Start animation
+        function startAnimation() {
+            cancelAnimationFrame(animationFrameId);
+            startTime = null;
+            if (!waveChart) createChart();
+            animationFrameId = requestAnimationFrame(animateWaveform);
+        }
+
+        // Stop animation
+        function stopAnimation() {
+            cancelAnimationFrame(animationFrameId);
+        }
+
+        // Reset function
+        function resetInputs() {
+            depthInput.value = '10';
+            amplitudeInputs.forEach((input, index) => {
+                input.value = index === 0 ? '1' : '0';
+            });
+            periodInputs.forEach((input) => {
+                input.value = '12';
+            });
+            elapsedTimeDisplay.textContent = 'Elapsed Time: 0.0 s';
+            stopAnimation();
+            updateCalculatedValues();
+            if (waveChart) {
+                waveChart.destroy();
+                waveChart = null;
+            }
+        }
+
+        // Event listeners
+        startButton.addEventListener('click', startAnimation);
+        stopButton.addEventListener('click', stopAnimation);
+        resetButton.addEventListener('click', resetInputs);
+
+        depthInput.addEventListener('input', updateCalculatedValues);
+        amplitudeInputs.forEach((input) => {
+            input.addEventListener('input', updateCalculatedValues);
+        });
+        periodInputs.forEach((input) => {
+            input.addEventListener('input', updateCalculatedValues);
+        });
+
+        // Initial calculation
+        updateCalculatedValues();
+    </script>
+</body>
+</html>

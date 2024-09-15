@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<!-- Mirrored from personal.egr.uri.edu/grilli/APLET/streamless.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 14 Sep 2024 11:50:59 GMT -->
+<HEAD>
+   <TITLE> Stream Function Wave Theory </TITLE>
+   </HEAD>
+<BODY>
+<img src="cacr.mini.gif" ALIGN="LEFT">
+<CENTER><P><FONT COLOR="#0000FF"><FONT SIZE=+4>
+Stream Function Wave Theory</FONT></FONT></P></CENTER>
+
+<CENTER><P>
+<HR WIDTH="100%"></P></CENTER>
+
+<CENTER><P><APPLET code= Streamless.class
+ width=600 height=550> This application requires a Java-enhanced browser to use.  Sorry.</APPLET></P></CENTER>
+
+ Stream function wave theory was developed by Dean (J. Geophys. Res., 1965) to examine fully nonlinear water waves numerically.  The method involves computing a series soluton to the fully nonlinear water wave problem, involving the Laplace equation with two nonlinear free surface boundary conditions (constant pressure, and a wave height constraint (Dalrymple, J.Geophys. Res., 1974)).  
+<p>
+For a test case, try a 8 m wave with a 10 second period in 12 m of water, with 10th order theory (leave the damping at 0.3). The figure shows that the wave form is much different than that given by linear wave theory (which has a zero crossing at L/4). The text window shows the stream function coefficients, the errors to the boundary conditions and constraints, and provides the free surface elevations with distance. 
+<p>
+By varying the wave height (rerunning the applet by using the Reset button and editing the wave parameters), you can show the effects of wave amplitude on wave length (and on wave speed, since the speed of the wave is the wave length divided by the wave period.
+<p>
+The velocities under the stream function wave can be examined by clicking the mouse at any location within the water.
+<p>
+This java implementation of the Stream function wave theory allows thirty iterations to find the best fit (collocation) solution to the problem.  If the total error (Bernoulli + wave height + mean water level) are less than .0001 m, the solution will stop. Adjusting the damping to larger numbers (up to 1.0) will increase convergence for not-so-nonlinear waves, while the damping can be reduced (but greater than 0.0) for obtaining very nonlinear wave solutions.
+<p>
+The order of the Stream function wave is a measure of how nonlinear the wave is.  In deep water, the order can be low, 3 to 5 say, while, in very shallow water, the order can be as great as 30.  A measure of which order to use is to choose an order and then increase it by one and obtain another solution.  If the results do not change significantly, then you have the right order.
+<p> 
+For very shallow water, a triple crested solution sometimes results. This is an attempt by the Stream Function theory to develop a periodic wave train, not a new wave discovery (Dalrymple and Solano, J. Waterway, Port, Coastal and Ocean Eng, 1986).  With this version of the model, you can't obtain the correct solution, as the solution needs to be built up from lower order solutions.
+
+<p><FONT COLOR="#FF0000">Comments: <a href="mailto:rad@udel.edu"> Robert A. Dalrymple</a></BODY>
+<!-- Mirrored from personal.egr.uri.edu/grilli/APLET/streamless.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 14 Sep 2024 11:51:00 GMT -->
+</HTML>   </BODY>
+</HTML>
