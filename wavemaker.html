@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>CACR Wavemaker Calculator</title>
+</head>
+<body bgcolor="#C0C0C0">
+
+    <img src="cacr.mini.gif" align="left">
+    
+    <!-- Clear floating image to avoid overlap -->
+    <div style="clear: left;">
+        <p><font color="#0000FF"><font size="+4"><center>Java Wavemaker</center></font></font></p>
+        <center><p>
+        <hr width="100%"></p></center>
+
+        
+        <center>
+            <div id="app-container" style="width: 700px; height: 400px;">
+                <!-- Wave Calculator will be rendered here -->
+            </div>
+        </center>
+
+    </div>
+
+    
+        <!-- Ensure proper spacing between the calculator and the following content -->
+        <div style="margin-top: 50px;">
+            <p><font color="#000000">
+                The two common methods to generate waves in the laboratory utilize either a piston paddle motion (with no vertical variation of paddle displacement over the depth) or flap motion (the paddle is hinged at the bottom). The waves are created by the motion of the paddle as the paddle induces horizontal (and vertical) velocities to the water.
+                <p>
+                The height of the wave created by the paddle motion is related to the stroke of the paddle, which will be denoted by the horizontal displacement of the paddle at the still water line. This applet solves for the stroke, given the desired wave height.
+                <p>
+                In shallow water, the piston wave paddle is more effective than the flap as the horizontal water particle velocities of the wave (and paddle) are nearly constant over the water column. In deep water, the reverse is true, as the wave motions are confined near the surface (much like the flap paddle).
+                <p>
+                The power (given in watts) required to make the desired wave is determined using a fluid density of 1000 kg per cubic meter.  For different fluid densities, divide the result by 1000 and multiply by your density.
+                
+                <p> The calculations for linear wavemaker theory are given in Chapter 6 of Dean and Dalrymple, <b>Water Wave Mechanics for Engineering and Scientists,</b> World Scientific Press.)
+             </font></p>
+        </div>
+
+    <!-- Include the JavaScript files -->
+    <script src="Hyper.js"></script>
+    <script src="Refract.js"></script>
+    <script src="Wvnumev.js"></script>
+    <script src="Wavemaker.js"></script>
+</body>
+</html>
+

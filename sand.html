@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sediment Transport Calculator</title>
+</head>
+<body bgcolor="#C0C0C0">
+
+    <img src="cacr.mini.gif" align="left">
+    
+    <!-- Clear floating image to avoid overlap -->
+    <div style="clear: left;">
+        <p><font color="#0000FF"><font size="+4"><center>Sediment Transport Calculator</center></font></font></p>
+        <center><p>
+        <hr width="100%"></p></center>
+
+        
+        <center>
+            <div id="wave-calculator" style="width: 600px; height: 250px;">
+                <!-- Wave Calculator will be rendered here -->
+            </div>
+        </center>
+
+        <!-- Ensure proper spacing between the calculator and the following content -->
+        <div style="margin-top: 50px;">
+            <p><font color="#000000">
+               The sediment transport on a shoreline depends on the incident wave waves (height and direction).  The shoreline diffusivity is a parameter of use in one-line models of shoreline behavior.  (See the Java applets for <a href="oneline.html"> beach fill behavior</a>  and the <a href="groin.html">single groin evolution</a>.)    
+               <p>
+               Here you need to input the breaking wave height and wave angle to determine Q, the longshore sediment transport.  To also determine G, the shoreline diffusivity, you need to input some geometry of the beach profile--the berm height and the depth of closure (the depth beyond which the profile does not change with time).
+               <p>
+               Assumed values:  sand porosity = 0.3, specific gravity of sand= 2.65, breaking index = 0.78.  To change the output values of Q and G for a different value of porosity (p), multiply the output values by (1-0.3)/(1-p).  For a different specific gravity (s), multiply the output by (2.65 - 1)/(s-1).
+                </font></p>
+        </div>
+    </div>
+
+    <!-- Include the JavaScript files -->
+    <script src="Sand.js"></script>
+</body>
+</html>

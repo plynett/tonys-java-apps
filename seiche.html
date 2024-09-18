@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CACR Seiche Calculator</title>
+    <style>
+        body {
+            background-color: #C0C0C0;
+            font-family: Arial, sans-serif;
+        }
+        #app-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        canvas {
+            border: 1px solid #000;
+            background-color: lightgray;
+        }
+        .control-panel {
+            margin-right: 20px;
+        }
+        .control-panel label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .control-panel input {
+            margin-bottom: 10px;
+        }
+        .control-panel button {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="cacr.mini.gif" align="left" alt="CACR logo">
+    <div style="clear: left;">
+        <p style="color: #0000FF; font-size: 24px; text-align: center;">
+            University of Delaware <br> Seiche Calculator
+        </p>
+        <hr width="100%">
+        <div id="app-container"></div>
+        <div id="info" style="color: #000000; margin-top: 30px; padding: 0 20px;">
+            Seiching is the formation of standing waves in water body, due to wave formation and subsequent reflections from the ends. These waves may be incited by earthquake motions (similar to the motions caused by shaking a glass of water), impulsive winds over the surface, or due to wave motions entering the basin.  The various modes of seiching correspond to the natural frequency reponse of the water body.
+
+<p> In this example, a rectangular basin (of infinite width) with given length and depth is seiching in accordance with the mode that you specified (greater than zero).  The period of seiching (T) is determined by finding the correct length wave that will fit in the basin  for the given  water depth  (based on linear water wave theory).  The percent refers to the difference between the seiching period predicted by the dispersion relationship versus that usually used: shallow water theory.
+<p>
+As an example, try a basin of length 100 m, a depth of 20 m, and a mode number of two.  Note that the water surface motion is out of phase with the velocities (shown with white lines). Also notice that the water motions do not have the elliptical orbits as progressive waves do (as in the Linear Kinematics applet).  Under a node (no displacement of the water surface), the velocity is always horizontal, while under an antinode (max. displacement), the velocity  is vertical.
+
+<p>
+In the figure, you will notice that the number of modes corresponds to the number of nodal points (points of no motion of the water surface). 
+<p>
+There are an infinite number of seiching modes possible, from the lowest (mode 1) to infinity.  The period of oscillation decreases with mode number. Realistically, the lower modes probably occur in nature, as frictional damping affects the higher modes preferentially (higher frequency).
+
+
+
+ <p> The seiching calculations for linear  theory are given in Chapter 4 and 5 of Dean and Dalrymple, <b>Water Wave Mechanics for Engineers and Scientists,</b> World Scientific Press.)
+        </div>
+    </div>
+
+    <script>
+        class SeicheApp {
+            constructor() {
+                this.panel = new InputPanel(this);
+                this.graph = new PlotPanel();
+                this.init();
+            }
+
+            init() {
+                const container = document.getElementById('app-container');
+                container.appendChild(this.panel.getElement());
+                container.appendChild(this.graph.getElement());
+            }
+
+            reset() {
+                this.panel.reset();
+                this.graph.reset();
+            }
+        }
+
+        class InputPanel {
+            constructor(parent) {
+                this.parent = parent;
+                this.L = 100;  // Basin length
+                this.d = 20;   // Basin depth
+                this.m = 2;    // Mode number
+
+                this.element = document.createElement('div');
+                this.element.classList.add('control-panel');
+                this.createInputPanel();
+            }
+
+            createInputPanel() {
+                const layout = document.createElement('div');
+
+                layout.appendChild(this.createLabel('Basin Length (m):'));
+                this.Lin = this.createTextField(this.L);
+                layout.appendChild(this.Lin);
+
+                layout.appendChild(this.createLabel('Basin Depth (m):'));
+                this.din = this.createTextField(this.d);
+                layout.appendChild(this.din);
+
+                layout.appendChild(this.createLabel('Mode Number:'));
+                this.min = this.createTextField(this.m);
+                layout.appendChild(this.min);
+
+                this.calculateButton = this.createButton('Calculate', this.calculateSeiche.bind(this));
+                layout.appendChild(this.calculateButton);
+
+                this.resetButton = this.createButton('Reset', this.reset.bind(this));
+                layout.appendChild(this.resetButton);
+
+                this.element.appendChild(layout);
+            }
+
+            createLabel(text) {
+                const label = document.createElement('label');
+                label.innerText = text;
+                return label;
+            }
+
+            createTextField(defaultValue) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = defaultValue;
+                return input;
+            }
+
+            createButton(text, callback) {
+                const button = document.createElement('button');
+                button.innerText = text;
+                button.onclick = callback;
+                return button;
+            }
+
+            getElement() {
+                return this.element;
+            }
+
+            calculateSeiche() {
+                this.L = parseFloat(this.Lin.value);
+                this.d = parseFloat(this.din.value);
+                this.m = parseInt(this.min.value);
+
+                if (isNaN(this.L) || isNaN(this.d) || isNaN(this.m) || this.m <= 0) {
+                    alert('Please enter valid input values.');
+                    return;
+                }
+
+                this.parent.graph.calculateSeiche(this.L, this.d, this.m);
+            }
+
+            reset() {
+                this.Lin.value = '100';
+                this.din.value = '20';
+                this.min.value = '2';
+                this.parent.graph.reset();
+            }
+        }
+
+        class PlotPanel {
+            constructor() {
+                this.canvas = document.createElement('canvas');
+                this.canvas.width = 600;
+                this.canvas.height = 300;
+                this.ctx = this.canvas.getContext('2d');
+
+                this.L = 0;
+                this.d = 0;
+                this.m = 0;
+                this.stop = false;
+                this.jstep = 0;
+            }
+
+            getElement() {
+                return this.canvas;
+            }
+
+            calculateSeiche(L, d, m) {
+                this.L = L;
+                this.d = d;
+                this.m = m;
+                this.k = this.m * Math.PI / this.L;
+
+                this.Tl = 2 * this.L / (this.m * Math.sqrt(9.81 * this.d)); // Shallow water
+                this.T = 2 * this.L / (this.m * Math.sqrt(9.81 * Math.tanh(this.k * this.d) / this.k));
+
+                this.jstep = 0;
+                this.stop = false;
+                this.animateSeiche();
+            }
+
+            animateSeiche() {
+                if (!this.stop) {
+                    this.jstep += 1 / 30;
+                    this.drawSeiche();
+                    requestAnimationFrame(this.animateSeiche.bind(this));
+                }
+            }
+
+            drawSeiche() {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+
+                const amplitude = 100; // Arbitrary scaling for visualization
+                const yOffset = this.canvas.height / 2;
+                const sigma = 2 * Math.PI / this.T;
+                
+                // Draw wave (seiche) on the canvas
+                ctx.beginPath();
+                for (let i = 0; i < this.canvas.width; i++) {
+                    const xRatio = i / this.canvas.width;
+                    const x = this.L * xRatio;
+                    const y = amplitude * Math.cos(this.m * Math.PI * x / this.L) * Math.cos(sigma * this.jstep);
+                    ctx.lineTo(i, yOffset - y);
+                }
+                ctx.stroke();
+
+                // Draw velocities (simplified version for now)
+                const velocityAmplitude = 50;
+                const velocityYPos = yOffset + 50;
+
+                for (let i = 0; i < 8; i++) {
+                    const x = (i / 7) * this.canvas.width;
+                    const velocity = velocityAmplitude * Math.sin(sigma * this.jstep + (i * Math.PI / 4));
+                    ctx.beginPath();
+                    ctx.moveTo(x, velocityYPos);
+                    ctx.lineTo(x, velocityYPos - velocity);
+                    ctx.strokeStyle = 'white';
+                    ctx.stroke();
+                }
+
+                // Display calculated period
+                ctx.fillStyle = 'yellow';
+                ctx.font = '16px Arial';
+                ctx.fillText(`T (mode ${this.m}) = ${this.T.toFixed(2)} s`, this.canvas.width - 180, 30);
+                const percentDiff = ((this.T - this.Tl) / this.T * 100).toFixed(2);
+                ctx.fillText(`Percent difference = ${percentDiff}%`, this.canvas.width - 180, 50);
+            }
+
+            reset() {
+                this.stop = true;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        // Initialize the Seiche App
+        window.onload = () => {
+            new SeicheApp();
+        };
+    </script>
+
+</body>
+</html>
+
+
+

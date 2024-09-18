@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>CACR Linear Wave Velocities</title>
+</head>
+<body bgcolor="#C0C0C0">
+
+    <img src="cacr.mini.gif" align="left">
+    
+    <!-- Clear floating image to avoid overlap -->
+    <div style="clear: left;">
+        <p><font color="#0000FF"><font size="+4"><center>Velocities Under Water Waves</center></font></font></p>
+        <center><p>
+        <hr width="100%"></p></center>
+
+        
+        <center>
+            <div id="app-container" style="width: 800px; height: 250px;">
+                <!-- Wave Calculator will be rendered here -->
+            </div>
+        </center>
+
+        <!-- Ensure proper spacing between the calculator and the following content -->
+        <div style="margin-top: 50px;">
+            <p><font color="#000000">
+               Enter the required (metric) wave data in the boxes and then press the Calculate button. To try a different case, press the Stop button, edit the input parameters as you like and press Calculate again. (Note: you can speed up the motion by pressing Calculate several times.)
+               <p> The display shows the wave form and the associated water particle position and the velocity vector. The trajectory of the water particle is an elliptical path.
+               <p> As an example, you might compare the case: wave height = 2 m, period = 6 sec, depth = 10 m to the case of longer waves, by changing the period to 12 sec. Note that the horizontal velocities under the second wave are almost constant with depth as compared to the shorter period wave. Then you might try changing the period to 2 secs.
+               <p>
+               The water particle velocities under linear waves are maximum at the surface and decrease in magnitude with depth. In shallow water, the elliptical paths followed by the water particles flatten to horizontal lines, particularly at the bottom, where no vertical flow is allowed into the bottom. The directions of the particle velocities are related to the motion of the water surface and the local velocity vectors are shown within their elliptical orbital paths in the panel. At the crest of the wave, the water motion is horizontal and in the direction of the wave.  At the trough, the velocity is reversed (but of the same magnitude as at the crest--this is linear theory).  Vertical velocities reach their maxima when the still water crossings occur.
+               <p>
+                The wave length of the wave is shown in the panel denoted L (in meters).  The maximum horizontal and vertical velocities (occurring at the water surface) are  denoted as u_max and v_max respectively (m/sec).
+               
+               <p>
+               Note that this figure is distorted.  The horizontal extent of the figure is the wave length given in the figure and the vertical extent (below the mean water level) is the depth that you specified.  
+             </font></p>
+        </div>
+    </div>
+
+    <!-- Include the JavaScript files -->
+    <script src="Hyper.js"></script>
+    <script src="Refract.js"></script>
+    <script src="LinearPlot.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE> CACR Wavemaker Calculator</TITLE>
+    </HEAD>
+<BODY bgcolor="#C0C0C0">
+
+<img src="cacr.mini.gif" ALIGN="LEFT">
+ <P><FONT COLOR="#0000FF"><center><FONT SIZE=+4>
+Java Wavemaker</center></FONT></P> 
+
+<clear "LEFT">
+
+ <P>
+<HR WIDTH="100%"></P></CENTER>
+
+<CENTER><P><APPLET code= Wavemaker archive="wavemaker.jar" width=600 height=250> This application requires a Java-enhanced browser to use.  Sorry.</APPLET></P></CENTER>
+<font color="#000000"><p>
+The two common methods to generate waves in the laboratory utilize either a piston paddle motion (with no vertical variation of paddle displacement over the depth) or flap motion (the paddle is hinged at the bottom). The waves are created by the motion of the paddle as the paddle induces horizontal (and vertical) velocities to the water.
+Choose the wavemaker type with the first menu button.<p>
+The height of the wave created by the paddle motion is related to the stroke of the paddle, which will be denoted by the horizontal displacement of the paddle at the still water line. This applet solves for the stroke, given the desired wave height. The applet also provides the wave length of the wave, <strong> L</strong>, and the mean power required by  the wavemaker (per unit width of paddle).
+<p>
+In shallow water, the piston wave paddle is more effective than the flap as the horizontal water particle velocities of the wave (and paddle) are nearly constant over the water column. In deep water, the reverse is true, as the wave motions are confined near the surface (much like the flap paddle).
+<p>
+The mathematical problem of the wavemaker is often solved by assuming a progressive wave mode (the desired wave) and evanescent modes, which are waves that only exist near the wavemaker and allow the water motion to match the paddle motion.  By choosing Velocity Modes with the second button, the progressive wave mode (in red) and the  first three evanescent modes are depicted, along with their magnitudes.  The sum of these four modes will match the paddle velocity quite well (keeping in mind that there are an infinite number of evanescent modes available).<p>
+The mean power (given in watts) required to make the desired wave is determined using a fluid density of 1000 kg per cubic meter.  For different fluid densities, divide the result by 1000 and multiply by your density. The instantaneous power required to make the waves will be greater than the mean by more than a factor of two.
+
+<p> The calculations for linear wavemaker theory are given in Chapter 6 of Dean and Dalrymple, <b>Water Wave Mechanics for Engineers and Scientists,</b> World Scientific Press.)
+<p><strong>
+Problem:</strong> Compare the stroke necessary to create a 3 second wave period wave in 2 m of water with a height of 0.5 m with a piston and a flap wavemaker.  Explain why the required power is the same for both.    Which type of wavemaker would you use for this case?
+<P><FONT COLOR="#FF0000">Comments: <a href="mailto: rad@udel.edu"> Robert Dalrymple</a></FONT>
+<br>Center for Applied Coastal Research<br>
+University of Delaware, Newark DE 19716<br>USA
+
+</BODY>
+</HTML>

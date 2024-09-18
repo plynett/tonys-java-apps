@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE> CACR Wind Surge</TITLE>
+   </HEAD>
+<BODY>
+
+  <img src="cacr.mini.gif" ALIGN="LEFT">
+<FONT COLOR="#0000FF"><center> <font size=+3>Wind Surge in a Basin </FONT></P> </center>
+
+<CENTER><P>
+<HR WIDTH="100%"></P></CENTER>
+
+<CENTER><P><APPLET code= WindSurge  width=600 height=250>This application requires a Java-enhanced browser to use.  Sorry.</APPLET></P></CENTER>
+
+ 
+<font color ="#000000">
+<p>
+ 
+Strong winds on the surface of a body of water will cause the water to pile up against the downwind side, due to the stresses exerted on the water surface.  This applet illustrates this effect for a basin with the wind blowing directly across it (here left to right).  The important variables are the length of the basin, the water depth, and the wind speed.  At the downstream side of the basin, a wall (in red) exists to keep the water in the basin. If it is too low, water will escape the basin and the maximum surge in the basin is equal to the wall height. 
+
+<p> Press the Calculate Button to determine the surge.  You can edit the variables and recalulate. (Try 120 km/hr wind.)  The output variables eta(0) and eta(l) are the deviations from still water level at the upwind and downwind ends of the basin respectively, in meters.
+<p>
+The equation for the water behavior is given in Dean and Dalrymple, <strong> Water Wave Mechanics for Engineers and Scientists</strong>, chapter 5, Eq. 5.96, which is the balance between the wind+bottom stress on the water and a hydrostatic force, manifested by a water surface slope.  If the surge elevation is not greater than the downwind wall, the total amount of water in the basin is the same before and during the wind.  If overtopping occurs, there is less water in the basin.  Further, for strong winds, the bottom can be exposed on the upwind side.
+<p>
+Note that this figure is distorted.  The horizontal extent of the figure is the basin length and the vertical extent  is the total of the basin still water depth and the wall heigth that you specified.  
+<p>
+If the wind stops suddenly, the basin will then probably seiche, with the water rocking back and forth in the basin.  Try using the <a href="http://www.coastal.udel.edu/faculty/rad/seiche.html"> Seiche</a> calculator to examine this subsequent behavior of the water. Type in your basin geometry (note length of basin in Seiche is meters, not kilometers) and use Modal Number =1. 
+<p>
+<strong> Problem:</strong>  Assess the effect of varying the windspeed on the surge elevations for a given basin geometry.  Do the same with the water depth and basin length for a fixed wind speed.  Plot your results.  
+<p>
+<strong> Problem:</strong>  Examine the influence of the end wall.  Find a basin size and wind speed such that a given wall height is overtopped (note: if overtopping occurs, the word 'overtopping' is written next to the eta(l) value.)
+Then, increase the wall elevation until overtopping stops.  Explain the difference in results. 
+<p>
+<FONT COLOR="#FF0000">Comments: <a href="mailto:rad@udel.edu"> Robert A. Dalrymple</a>
+</BODY>
+</HTML>

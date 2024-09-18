@@ -1,0 +1,47 @@
+  <!DOCTYPE html>
+<html>
+<head>
+    <title>Harmonic Tidal Prediction</title>
+</head>
+<body bgcolor="#C0C0C0">
+
+    <img src="cacr.mini.gif" align="left">
+    
+    <!-- Clear floating image to avoid overlap -->
+    <div style="clear: left;">
+        <p><font color="#0000FF"><font size="+4"><center>Tidal Prediction with Harmonic Analysis</center></font></font></p>
+        <center><p>
+        <hr width="100%"></p></center>
+
+        
+        <center>
+            <div id="wave-calculator" style="width: 600px; height: 450px;">
+                <!-- Wave Calculator will be rendered here -->
+            </div>
+        </center>
+
+        <!-- Ensure proper spacing between the calculator and the following content -->
+        <div style="margin-top: 50px;">
+            <p><font color="#000000">
+              Tides in large bodies of water are created primarily by the gravitational actions of the moon and the sun.  
+
+              Predictions of the tides is important primarily for navigation, and tidal predictions are made around the world and published for general use.
+              
+              Tides can be predicted by harmonic analysis, which is the superposition of many sinusoidal components with amplitudes and frequencies determined by a local analysis of the measured tide. For an online discription of this process, see Tony Phillips' <a href="http://math.math.sunysb.edu/~tony/tides/index.html"> page</a>.
+              <p>
+              This example shows the tides predicted at Breakwater Harbor in Delaware.  The tidal components by name are shown in the table.  You may choose the number of tidal components to superimpose (from 1 to 18) and you may choose the number of days to plot (up to 60--more than that is beyond the screen resolution). 
+              Also, if you would like to examine just one component, choose Single rather than Sum  with the Choice button--the component associated with the number in the "Number of Harmonics?" box will be plotted as scaled by the first tidal component (here, M(2)), which must be the largest. For example, to compare the difference between the principal lunar tide M(2), which is semi-diurnal, with the K(1) tide, which is diurnal, type first '1' in the Number of Components box and hit Calculate. Then
+              type '4' in the Number box to get the fourth component, K(1).  If you plot only 5 days or so, it will be easier to see the number of tides per day.
+              
+              Also, if you would like to examine just one component, choose Single rather than Sum  with the Choice button--the component associated with the number in the "Number of Harmonics?" box will be plotted as scaled by the first tidal component (here, M(2)), which must be the largest. 
+              <p>
+              You may edit these components (but not add any more than there are here) and
+              change the name of the site.  The new tides will be computed. <b>Problem:</b> Determine the wave period of the wave that would just be 'feeling' the bottom in 10 m of water. The bottom begins to affect waves when the depth of the water is half the length of the wave, therefore for which wave period is the wave length equal to 20 m? Note that the wave height (for linear theory) does not affect the calculation. Click <a href="answers.html">here</a> for the answer.
+            </font></p>
+        </div>
+    </div>
+
+    <!-- Include the JavaScript files -->
+    <script src="Tide.js"></script>
+</body>
+</html>

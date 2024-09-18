@@ -1,0 +1,19 @@
+This is the source code for Dalrymple's Coastal Engineering Java applets.
+To install, untar in the final desired directory:
+   tar -xvf javapp.tar
+
+There is a makefile that can be used to compile the source code (*.java) into
+byte code (*.class).  If you have the java compiler (javac) in /usr/local/java/bin
+then you need only type 'make' in the directory you untarred the source files.  If
+javac is elsewhere, edit Makefile appropriately.
+
+By using Netscape's open file command pointed at index.html in this directory,
+you should have access to all the applets.
+
+Good luck and send me feedback.
+
+Tony Dalrymple
+Center for Applied Coastal Research
+University of Delaware
+Newark, DE USA 19716
+rad@udel.edu

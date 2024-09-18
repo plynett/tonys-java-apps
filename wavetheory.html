@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CACR Wave Calculator</title>
+</head>
+<body bgcolor="#C0C0C0">
+
+    <img src="cacr.mini.gif" align="left">
+    
+    <!-- Clear floating image to avoid overlap -->
+    <div style="clear: left;">
+        <p><font color="#0000FF"><font size="+4"><center>University of Delaware 
+        Wave Calculator</center></font></font></p>
+        <center><p>
+        <hr width="100%"></p></center>
+
+        
+        <center>
+            <div id="wave-calculator" style="width: 600px; height: 550px;">
+                <!-- Wave Calculator will be rendered here -->
+            </div>
+        </center>
+
+        <!-- Ensure proper spacing between the calculator and the following content -->
+        <div style="margin-top: 50px;">
+            <p><font color="#000000">
+            The Wave Calculator works in metric, taking deepwater wave height, period (seconds) or frequency (Hz), and wave direction (in degrees), and determining the wave length (L, in m), the wave number (k, in 1/m), wave celerity (C = L/T, in m/s), direction (degrees), shoaling and refraction coefficients (Ks, Kr), and the group velocity Cg at the shallow water depth you specify. The magnitude of the bottom velocity u_b is also calculated.</font></p>
+
+            <p><font color="#000000">
+            The calculations are based on the dispersion relationship for progressive linear water waves and Snell's Law for straight and parallel offshore contours. (Ref: Dean and Dalrymple, <b>Water Wave Mechanics for Engineers and Scientists,</b> World Scientific Press.)
+            </font></p>
+            
+            <p><font color="#000000">
+            <b>Problem:</b> Determine the wave period of the wave that would just be 'feeling' the bottom in 10 m of water. The bottom begins to affect waves when the depth of the water is half the length of the wave, therefore for which wave period is the wave length equal to 20 m? Note that the wave height (for linear theory) does not affect the calculation. Click <a href="answers.html">here</a> for the answer.
+            </font></p>
+        </div>
+    </div>
+
+    <!-- Include the JavaScript files -->
+    <script src="Hyper.js"></script>
+    <script src="Refract.js"></script>
+    <script src="WaveTheory.js"></script>
+</body>
+</html>
